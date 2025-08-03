@@ -7,8 +7,9 @@ WORKDIR /app
 # Copy dependency files
 COPY package*.json ./
 
-# Install dependencies
+# Install dependencies and TypeScript
 RUN npm install
+RUN npm install -g typescript ts-node
 
 # Copy all files to the container
 COPY . .
@@ -16,5 +17,5 @@ COPY . .
 # Expose the port your app uses
 EXPOSE 3000
 
-# Run the app (assuming your entry point is index.js at root)
-CMD ["node", "index.js"]
+# Run the app with ts-node
+CMD ["npx", "ts-node", "index.ts"]
