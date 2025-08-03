@@ -9,7 +9,7 @@ services:
       - DATABASE_USER=postgres
       - DATABASE_PASS=password
       - DATABASE_NAME=social_media_apis
-      - JWT_SECRET=your_jwt_secret_key_here
+      - JWT_SECRET=my_super_secret_jwt_key_12345
       - PORT=3000
       - NODE_ENV=production
     depends_on:

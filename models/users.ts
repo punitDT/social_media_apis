@@ -29,8 +29,12 @@ const users = (sequelize: Sequelize) => {
         timestamps: true,
     });
 
-    /// sync model
-    users.sync({ alter: true });
+    /// sync model - create table if it doesn't exist
+    users.sync({ force: false }).then(() => {
+        console.log('Users table created successfully');
+    }).catch((error) => {
+        console.error('Error creating users table:', error);
+    });
 
     return users;
 };

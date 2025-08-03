@@ -77,7 +77,13 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
         }
 
         /// send signed jwt token
-        const auth_token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || "fallback_secret", {
+        const jwtSecret = process.env.JWT_SECRET;
+        if (!jwtSecret) {
+            console.error('JWT_SECRET environment variable is not set');
+            return res.status(500).json({ message: 'Server configuration error' });
+        }
+
+        const auth_token = jwt.sign({ id: user.id }, jwtSecret, {
             expiresIn: 86400, // 24 hours
         });
 
