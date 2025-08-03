@@ -1,20 +1,20 @@
 # Use official Node.js base image
 FROM node:18
 
-# Set the working directory inside the container
+# Set working directory inside the container
 WORKDIR /app
 
-# Copy dependency definition files
+# Copy dependency files
 COPY package*.json ./
 
-# Install project dependencies
+# Install dependencies
 RUN npm install
 
-# Copy remaining project files
+# Copy all files to the container
 COPY . .
 
-# Expose the app port (match your app's port)
+# Expose the port your app uses
 EXPOSE 3000
 
-# Run the app
-CMD ["node", "src/index.js"]
+# Run the app (assuming your entry point is index.js at root)
+CMD ["node", "index.js"]
