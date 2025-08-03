@@ -18,4 +18,4 @@ COPY . .
 EXPOSE 3000
 
 # Run the app with ts-node
-CMD ["npx", "ts-node", "index.ts"]
+CMD ["npx", "ts-node", "--transpile-only", "index.ts"]
