@@ -9,21 +9,39 @@ import jwt from 'jsonwebtoken';
 /// register user
 export const registerUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
-
         const { username, email, password } = req.body;
+
+        // Validate required fields
+        if (!username || !email || !password) {
+            return res.status(400).json({
+                message: 'Username, email, and password are required'
+            });
+        }
 
         /// encrypt password
         const encryptedPassword = await bcrypt.hash(password, 10);
 
-        await models.users.create({
+        const newUser = await models.users.create({
             username,
             email,
             password: encryptedPassword,
         });
 
-
-        res.json({ message: 'User registered' });
+        res.status(201).json({
+            message: 'User registered successfully',
+            user: {
+                id: newUser.id,
+                username: newUser.username,
+                email: newUser.email
+            }
+        });
     } catch (error) {
+        console.error('Registration error:', error);
+        if (error.name === 'SequelizeUniqueConstraintError') {
+            return res.status(409).json({
+                message: 'Username or email already exists'
+            });
+        }
         next(error);
     }
 };
@@ -31,14 +49,25 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
 /// login user
 export const loginUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
-
         const { email, password } = req.body;
+
+        // Validate required fields
+        if (!email || !password) {
+            return res.status(400).json({
+                message: 'Email and password are required'
+            });
+        }
 
         const user = await models.users.findOne({
             where: {
                 email,
             },
         });
+
+        // Check if user exists
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid credentials' });
+        }
 
         /// check password
         const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -48,14 +77,21 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
         }
 
         /// send signed jwt token
-        const auth_token = jwt.sign({ id: user.id }, process.env.JWT_TOKEN || "", {
+        const auth_token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || "fallback_secret", {
             expiresIn: 86400, // 24 hours
         });
 
-
-
-        res.json({ message: 'User logged in', auth_token });
+        res.json({
+            message: 'User logged in successfully',
+            auth_token,
+            user: {
+                id: user.id,
+                username: user.username,
+                email: user.email
+            }
+        });
     } catch (error) {
+        console.error('Login error:', error);
         next(error);
     }
 };
